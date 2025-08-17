@@ -86,7 +86,7 @@ const Certificates = () => {
                     </motion.a> */}
                   </div>
                   
-                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-gray-800 transition-colors duration-300">
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-gray-800 transition-colors duration-300">
                     {cert.title}
                   </h3>
                   

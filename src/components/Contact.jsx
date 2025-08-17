@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Mail, Phone, MapPin, Github, Linkedin, Send, MessageCircle, CheckCircle, AlertCircle } from 'lucide-react';
 
 const Contact = () => {
@@ -14,6 +14,36 @@ const Contact = () => {
     submitted: false,
     error: null
   });
+
+  // EmailJS configuration
+  const EMAILJS_SERVICE_ID = 'service_w4sqpy3';
+  const EMAILJS_TEMPLATE_ID = 'template_jq6zxsa';
+  const EMAILJS_PUBLIC_KEY = 'dRajbmKf3be_DEQxw';
+
+  useEffect(() => {
+    // Load EmailJS script
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+    script.async = true;
+    script.onload = () => {
+      // Initialize EmailJS with public key
+      if (window.emailjs) {
+        window.emailjs.init(EMAILJS_PUBLIC_KEY);
+        console.log('EmailJS initialized successfully');
+      }
+    };
+    script.onerror = () => {
+      console.error('Failed to load EmailJS script');
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script when component unmounts
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, [EMAILJS_PUBLIC_KEY]);
 
   const contactInfo = [
     {
@@ -105,42 +135,110 @@ const Contact = () => {
       error: null
     });
 
-    try {
-      // Simulate form submission
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create mailto link with form data
-      const mailtoLink = `mailto:singhutkarsh919@gmail.com?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(
-        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-      )}`;
-      
-      // Open default email client
-      window.location.href = mailtoLink;
-      
-      // Reset form and show success
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-      
-      setFormStatus({
-        isSubmitting: false,
-        submitted: true,
-        error: null
-      });
+    // Wait a moment for EmailJS to be fully loaded
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Reset success message after 5 seconds
-      setTimeout(() => {
-        setFormStatus(prev => ({ ...prev, submitted: false }));
-      }, 5000);
-
-    } catch (error) {
+    // Check if EmailJS is loaded and initialized
+    if (!window.emailjs) {
+      console.error('EmailJS not loaded');
       setFormStatus({
         isSubmitting: false,
         submitted: false,
-        error: 'Failed to send message. Please try again.'
+        error: 'EmailJS service not loaded. Please refresh the page and try again.'
+      });
+      return;
+    }
+
+    try {
+      console.log('Attempting to send email with EmailJS...');
+      console.log('Service ID:', EMAILJS_SERVICE_ID);
+      console.log('Template ID:', EMAILJS_TEMPLATE_ID);
+      console.log('Public Key:', EMAILJS_PUBLIC_KEY);
+      console.log('Form Data:', formData);
+
+      // Send email using EmailJS with proper parameter structure
+      const result = await window.emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name: formData.name,        // matches {{name}} in template
+          email: formData.email,      // matches {{email}} in template  
+          subject: formData.subject,  // matches {{subject}} in template
+          message: formData.message,  // matches {{message}} in template
+          reply_to: formData.email    // matches {{reply_to}} in template
+        },
+        EMAILJS_PUBLIC_KEY
+      );
+
+      console.log('Email sent successfully:', result);
+      
+      if (result.status === 200 || result.text === 'OK') {
+        // Reset form and show success
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+        
+        setFormStatus({
+          isSubmitting: false,
+          submitted: true,
+          error: null
+        });
+
+        // Reset success message after 5 seconds
+        setTimeout(() => {
+          setFormStatus(prev => ({ ...prev, submitted: false }));
+        }, 5000);
+      } else {
+        throw new Error(`EmailJS returned status: ${result.status || 'Unknown'}`);
+      }
+
+    } catch (error) {
+      console.error('EmailJS error details:', error);
+      
+      let errorMessage = 'Failed to send message via EmailJS. ';
+      
+      if (error.status) {
+        switch (error.status) {
+          case 400:
+            errorMessage += 'Invalid request - please check EmailJS configuration.';
+            break;
+          case 401:
+            errorMessage += 'Unauthorized - check your EmailJS public key.';
+            break;
+          case 402:
+            errorMessage += 'Email quota exceeded. Please try again later.';
+            break;
+          case 403:
+            errorMessage += 'Forbidden - check your EmailJS service settings.';
+            break;
+          case 404:
+            errorMessage += 'Service or template not found - check your IDs.';
+            break;
+          case 413:
+            errorMessage += 'Message too large. Please shorten your message.';
+            break;
+          case 429:
+            errorMessage += 'Too many requests. Please try again later.';
+            break;
+          case 500:
+            errorMessage += 'Server error. Please try again later.';
+            break;
+          default:
+            errorMessage += `Error ${error.status}. Please try again.`;
+        }
+      } else if (error.message && error.message.includes('EmailJS')) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += 'Please contact me directly at singhutkarsh919@gmail.com';
+      }
+      
+      setFormStatus({
+        isSubmitting: false,
+        submitted: false,
+        error: errorMessage
       });
     }
   };
