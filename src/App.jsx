@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
+// import Hero from './components/Hero';
 import About from './components/About';
 import Education from './components/Education';
 import Skills from './components/Skills';
@@ -46,7 +46,7 @@ function App() {
         <ThreeBackground />
         <Navbar />
         <main>
-          <Hero />
+          {/* <Hero /> */}
           <About />
           <Education />
           <Skills />
