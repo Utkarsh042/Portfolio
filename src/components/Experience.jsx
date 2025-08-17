@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Briefcase, Calendar, MapPin, Building } from 'lucide-react';
+import { Briefcase, Calendar, MapPin, Building, ExternalLink } from 'lucide-react';
 
 const Experience = () => {
   const [inView, setInView] = useState(false);
@@ -35,7 +35,7 @@ const Experience = () => {
       position: 'Web Developer Intern',
       company: 'Enego Services Pvt. Ltd.',
       duration: 'Current Position',
-      location: 'Remote',
+      // location: 'Remote',
       type: 'Internship',
       description: 'Working on modern web applications using React.js and Node.js. Collaborating with senior developers to build scalable solutions and improve user experience.',
       technologies: ['React.js', 'Node.js', 'MongoDB', 'JavaScript', 'CSS3'],
@@ -43,26 +43,28 @@ const Experience = () => {
       status: 'current'
     },
     {
-      position: 'Web Development Intern',
+      position: 'Web Developer Intern',
       company: 'Safe Your Web',
-      duration: '2023',
-      location: 'Remote',
+      duration: '2024',
+      // location: 'Remote',
       type: 'Internship',
-      description: 'Developed responsive web applications and worked on frontend optimization. Gained experience in modern web development practices and collaborative coding.',
-      technologies: ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap', 'jQuery'],
+      description: 'Contributed to developing a "Security Captain Appointment" page and enhancing frontend functionality using ReactJS and Redux Toolkit.',
+      technologies: ['ReactJS', 'Redux Toolkit', 'HTML5', 'CSS3', 'JavaScript'],
       color: 'from-purple-400 to-pink-500',
-      status: 'completed'
+      status: 'completed',
+      link: '/documents/Safe_your_web.pdf'
     },
     {
       position: 'Frontend Developer Intern',
       company: 'CodSoft',
-      duration: '2023',
-      location: 'Remote',
+      duration: '2024',
+      // location: 'Remote',
       type: 'Internship',
-      description: 'Created responsive user interfaces and implemented interactive features. Learned best practices in frontend development and UI/UX design principles.',
+      description: 'Contributed to various projects, enhancing practical skills in software development. Created responsive user interfaces and implemented interactive features.',
       technologies: ['React.js', 'CSS3', 'JavaScript', 'Figma', 'Git'],
       color: 'from-green-400 to-teal-500',
-      status: 'completed'
+      status: 'completed',
+      link: '/documents/CodSoft.pdf'
     },
   ];
 
@@ -137,7 +139,21 @@ const Experience = () => {
                         <h3 className="text-lg font-bold text-white mb-1">{exp.position}</h3>
                         <div className="flex items-center gap-1 text-purple-400 font-semibold text-sm mb-2">
                           <Building size={14} />
-                          <span>{exp.company}</span>
+                          {exp.link ? (
+                            <div className="flex items-center gap-1">
+                              <ExternalLink size={12} className="text-cyan-400" />
+                              <a 
+                                href={exp.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="hover:text-cyan-400 transition-colors duration-200 underline decoration-dotted hover:decoration-solid"
+                              >
+                                {exp.company}
+                              </a>
+                            </div>
+                          ) : (
+                            <span>{exp.company}</span>
+                          )}
                         </div>
                       </div>
 
@@ -147,10 +163,10 @@ const Experience = () => {
                           <Calendar size={12} />
                           <span>{exp.duration}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-gray-400 text-sm">
+                        {/* <div className="flex items-center gap-1 text-gray-400 text-sm">
                           <MapPin size={12} />
                           <span>{exp.location}</span>
-                        </div>
+                        </div> */}
                       </div>
 
                       {/* Description */}

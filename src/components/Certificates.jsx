@@ -74,7 +74,7 @@ const Certificates = () => {
                     <div className={`w-12 h-12 bg-gradient-to-br ${cert.color} rounded-xl flex items-center justify-center`}>
                       <cert.icon className="text-white" size={24} />
                     </div>
-                    <motion.a
+                    {/* <motion.a
                       href={cert.link}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -83,7 +83,7 @@ const Certificates = () => {
                       whileTap={{ scale: 0.95 }}
                     >
                       <ExternalLink size={16} />
-                    </motion.a>
+                    </motion.a> */}
                   </div>
                   
                   <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors duration-300">
@@ -124,7 +124,7 @@ const Certificates = () => {
                   </div>
 
                   {/* View Certificate Button - Minimized */}
-                  <motion.a
+                  {/* <motion.a
                     href={cert.link}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -134,7 +134,7 @@ const Certificates = () => {
                   >
                     <span>View Certificate</span>
                     <ExternalLink size={14} />
-                  </motion.a>
+                  </motion.a> */}
                 </div>
               </motion.div>
             </motion.div>

@@ -4,13 +4,7 @@ import { Menu, X, Sun, Moon } from 'lucide-react';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [theme, setTheme] = useState(() => {
-    // Check localStorage or default to 'dark'
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') || 'dark';
-    }
-    return 'dark';
-  });
+  const [theme, setTheme] = useState('dark'); // Removed localStorage for Claude artifacts
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,8 +24,6 @@ const Navbar = () => {
       root.classList.remove('dark');
       root.style.colorScheme = 'light';
     }
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -55,6 +47,18 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  const scrollToHome = () => {
+    // Scroll to top of page or to home section
+    const homeElement = document.querySelector('#home');
+    if (homeElement) {
+      homeElement.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If no home section exists, scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    setIsOpen(false); // Close mobile menu if open
+  };
+
   return (
     <div className={theme === 'dark' ? 'dark' : ''}>
       <nav
@@ -68,7 +72,10 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent cursor-pointer hover:scale-105 transition-transform">
+            <div 
+              onClick={scrollToHome}
+              className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent cursor-pointer hover:scale-105 transition-transform"
+            >
               US
             </div>
 
@@ -95,7 +102,7 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <button
+              {/* <button
                 onClick={toggleTheme}
                 className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 ${
                   theme === 'dark'
@@ -104,7 +111,7 @@ const Navbar = () => {
                 }`}
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
+              </button> */}
 
               <button
                 onClick={() => setIsOpen(!isOpen)}

@@ -233,10 +233,10 @@ const ThreeBackground = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-purple-900/40 to-cyan-900/50 z-5"></div>
       
       {/* Hero Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center py-12">
+      <div className="relative z-10 min-h-screen flex items-start justify-center pt-12 pb-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Content background for better readability */}
-          <div className="relative bg-black/30 backdrop-blur-[2px] rounded-3xl border border-white/10 p-8 md:p-12 shadow-2xl">
+          {/* Content background for better readability - positioned closer to navbar */}
+          <div className="relative bg-black/30 backdrop-blur-[2px] rounded-3xl border border-white/10 p-8 md:p-12 shadow-2xl mt-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
