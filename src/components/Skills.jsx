@@ -42,7 +42,7 @@ const Skills = () => {
         { name: 'HTML', level: 95, color: 'bg-orange-600' },
         { name: 'CSS', level: 90, color: 'bg-blue-600' },
         { name: 'Tailwind CSS', level: 85, color: 'bg-teal-500' },
-        { name: 'SASS', level: 80, color: 'bg-pink-500' },
+        // { name: 'SASS', level: 80, color: 'bg-pink-500' },
       ]
     },
     {
@@ -52,8 +52,8 @@ const Skills = () => {
       skills: [
         { name: 'MongoDB', level: 85, color: 'bg-green-700' },
         { name: 'SQL Server', level: 80, color: 'bg-blue-700' },
-        { name: 'MySQL', level: 75, color: 'bg-orange-600' },
-        { name: 'Firebase', level: 70, color: 'bg-yellow-600' },
+        // { name: 'MySQL', level: 75, color: 'bg-orange-600' },
+        // { name: 'Firebase', level: 70, color: 'bg-yellow-600' },
       ]
     },
     {

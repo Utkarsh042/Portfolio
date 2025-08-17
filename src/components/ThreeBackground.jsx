@@ -30,20 +30,28 @@ const ThreeBackground = () => {
   useEffect(() => {
     if (!mountRef.current) return;
 
+    let scene, camera, renderer, particles, shapes = [];
+
     // Scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 0);
+    
+    // Clear any existing canvas
+    while (mountRef.current.firstChild) {
+      mountRef.current.removeChild(mountRef.current.firstChild);
+    }
+    
     mountRef.current.appendChild(renderer.domElement);
 
     // Store references
     sceneRef.current = scene;
     rendererRef.current = renderer;
 
-    // Create particle field with reduced opacity for better text visibility
+    // Create particle field
     const particleCount = 1500;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
@@ -71,11 +79,10 @@ const ThreeBackground = () => {
       opacity: 0.4
     });
 
-    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    particles = new THREE.Points(particleGeometry, particleMaterial);
     scene.add(particles);
 
-    // Create floating geometric shapes with reduced opacity
-    const shapes = [];
+    // Create floating geometric shapes
     const shapeCount = 10;
 
     for (let i = 0; i < shapeCount; i++) {
@@ -126,20 +133,24 @@ const ThreeBackground = () => {
 
       const time = Date.now() * 0.001;
 
-      // Slower particle field rotation
-      particles.rotation.x = time * 0.03;
-      particles.rotation.y = time * 0.05;
+      // Animate particles
+      if (particles) {
+        particles.rotation.x = time * 0.03;
+        particles.rotation.y = time * 0.05;
+      }
 
-      // Animate floating shapes with gentler movement
+      // Animate floating shapes
       shapes.forEach((shape, index) => {
-        shape.mesh.rotation.x += shape.rotationSpeed.x;
-        shape.mesh.rotation.y += shape.rotationSpeed.y;
-        shape.mesh.rotation.z += shape.rotationSpeed.z;
-        
-        shape.mesh.position.y += Math.sin(time * 0.3 + shape.floatOffset) * 0.008;
+        if (shape.mesh) {
+          shape.mesh.rotation.x += shape.rotationSpeed.x;
+          shape.mesh.rotation.y += shape.rotationSpeed.y;
+          shape.mesh.rotation.z += shape.rotationSpeed.z;
+          
+          shape.mesh.position.y += Math.sin(time * 0.3 + shape.floatOffset) * 0.008;
+        }
       });
 
-      // More subtle camera movement
+      // Camera movement
       camera.position.x = Math.sin(time * 0.05) * 1;
       camera.position.y = Math.cos(time * 0.04) * 0.5;
       camera.lookAt(0, 0, 0);
@@ -147,13 +158,16 @@ const ThreeBackground = () => {
       renderer.render(scene, camera);
     };
 
+    // Start animation
     animate();
 
     // Handle window resize
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (camera && renderer) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -164,27 +178,40 @@ const ThreeBackground = () => {
       
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
-      }
-      
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
+        animationRef.current = null;
       }
       
       // Dispose of geometries and materials
-      scene.traverse((object) => {
-        if (object.geometry) object.geometry.dispose();
-        if (object.material) {
-          if (Array.isArray(object.material)) {
-            object.material.forEach(material => material.dispose());
-          } else {
-            object.material.dispose();
+      if (scene) {
+        scene.traverse((object) => {
+          if (object.geometry) object.geometry.dispose();
+          if (object.material) {
+            if (Array.isArray(object.material)) {
+              object.material.forEach(material => material.dispose());
+            } else {
+              object.material.dispose();
+            }
           }
+        });
+        
+        // Clear the scene
+        while(scene.children.length > 0){ 
+          scene.remove(scene.children[0]); 
         }
-      });
+      }
       
-      renderer.dispose();
+      if (renderer) {
+        renderer.dispose();
+        if (mountRef.current && renderer.domElement && mountRef.current.contains(renderer.domElement)) {
+          mountRef.current.removeChild(renderer.domElement);
+        }
+      }
+
+      // Clear refs
+      sceneRef.current = null;
+      rendererRef.current = null;
     };
-  }, []);
+  }, []); // Empty dependency array
 
   const contactLinks = [
     { 
@@ -207,7 +234,7 @@ const ThreeBackground = () => {
     },
     { 
       icon: Phone, 
-      href: 'tel:+91XXXXXXXXXX', 
+      href: 'tel:+917380710191', 
       label: 'Phone',
       color: 'hover:text-green-400'
     },
@@ -218,15 +245,7 @@ const ThreeBackground = () => {
       {/* Three.js Background */}
       <div 
         ref={mountRef} 
-        className="absolute inset-0"
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 1
-        }}
+        className="absolute inset-0 z-0"
       />
       
       {/* Enhanced gradient overlay for better text visibility */}
@@ -235,143 +254,143 @@ const ThreeBackground = () => {
       {/* Hero Content */}
       <div className="relative z-10 min-h-screen flex items-start justify-center pt-12 pb-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Content background for better readability - positioned closer to navbar */}
+          {/* Content background for better readability */}
           <div className="relative bg-black/30 backdrop-blur-[2px] rounded-3xl border border-white/10 p-8 md:p-12 shadow-2xl mt-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-4"
-          >
             <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="relative inline-block mb-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="space-y-4"
             >
-              <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 p-1">
-                <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
-                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-cyan-400/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                    <span className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-                      US
-                    </span>
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="relative inline-block mb-6"
+              >
+                <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 p-1">
+                  <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-cyan-400/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                      <span className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
+                        US
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                  className="absolute inset-0 border-2 border-dashed border-cyan-400/30 rounded-full"
+                ></motion.div>
+              </motion.div>
+
+              <div className="space-y-3">
+                <motion.h1 
+                  className="text-3xl md:text-5xl font-bold text-white mb-3 drop-shadow-2xl"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <span className="bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent drop-shadow-2xl filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                    {currentText}
+                    <motion.span
+                      animate={{ opacity: [0, 1, 0] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                      className="text-cyan-300 drop-shadow-2xl"
+                    >
+                      |
+                    </motion.span>
+                  </span>
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                  className="text-lg md:text-xl text-gray-100 font-semibold drop-shadow-lg"
+                >
+                  Web Developer & MCA Student
+                </motion.p>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2 }}
+                  className="text-sm text-gray-200 max-w-xl mx-auto leading-relaxed font-medium drop-shadow-lg"
+                >
+                  Passionate about creating innovative web solutions with modern technologies. 
+                  Currently pursuing MCA and building impactful digital experiences.
+                </motion.p>
               </div>
+
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0 border-2 border-dashed border-cyan-400/30 rounded-full"
-              ></motion.div>
-            </motion.div>
-
-            <div className="space-y-3">
-              <motion.h1 
-                className="text-3xl md:text-5xl font-bold text-white mb-3 drop-shadow-2xl"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.4 }}
+                className="flex flex-wrap justify-center gap-3 mt-6"
               >
-                <span className="bg-gradient-to-r from-white via-cyan-200 to-purple-200 bg-clip-text text-transparent drop-shadow-2xl filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-                  {currentText}
-                  <motion.span
-                    animate={{ opacity: [0, 1, 0] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                    className="text-cyan-300 drop-shadow-2xl"
+                {contactLinks.map((link) => (
+                  <motion.a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-900/70 backdrop-blur-[1px] border border-gray-600/50 text-gray-100 ${link.color} transition-all duration-300 hover:bg-gray-800/80 hover:border-cyan-400/70 text-sm shadow-lg`}
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    |
-                  </motion.span>
-                </span>
-              </motion.h1>
+                    <link.icon size={16} />
+                    <span className="hidden sm:block">{link.label}</span>
+                  </motion.a>
+                ))}
+              </motion.div>
 
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-                className="text-lg md:text-xl text-gray-100 font-semibold drop-shadow-lg"
+                transition={{ delay: 1.6 }}
+                className="pt-6"
               >
-                Web Developer & MCA Student
-              </motion.p>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2 }}
-                className="text-sm text-gray-200 max-w-xl mx-auto leading-relaxed font-medium drop-shadow-lg"
-              >
-                Passionate about creating innovative web solutions with modern technologies. 
-                Currently pursuing MCA and building impactful digital experiences.
-              </motion.p>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
-              className="flex flex-wrap justify-center gap-3 mt-6"
-            >
-              {contactLinks.map((link) => (
-                <motion.a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-900/70 backdrop-blur-[1px] border border-gray-600/50 text-gray-100 ${link.color} transition-all duration-300 hover:bg-gray-800/80 hover:border-cyan-400/70 text-sm shadow-lg`}
+                <motion.button
+                  onClick={() => {
+                    const link = document.createElement('a');
+                    link.href = '/documents/Resume.pdf';
+                    link.download = 'Utkarsh_Singh_Resume.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full text-white font-semibold shadow-xl hover:shadow-cyan-500/50 transition-all duration-300 text-sm border border-white/20"
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <link.icon size={16} />
-                  <span className="hidden sm:block">{link.label}</span>
-                </motion.a>
-              ))}
-            </motion.div>
+                  <span className="flex items-center space-x-2">
+                    <Download size={16} />
+                    <span>Download Resume</span>
+                  </span>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                </motion.button>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.6 }}
-              className="pt-6"
-            >
-              <motion.button
-                onClick={() => {
-                  const link = document.createElement('a');
-                  link.href = '/documents/Resume.pdf';
-                  link.download = 'Utkarsh_Singh_Resume.pdf';
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-                className="group relative px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full text-white font-semibold shadow-xl hover:shadow-cyan-500/50 transition-all duration-300 text-sm border border-white/20"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <span className="flex items-center space-x-2">
-                  <Download size={16} />
-                  <span>Download Resume</span>
-                </span>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              </motion.button>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2 }}
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
-            >
               <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="w-5 h-8 border-2 border-cyan-300 rounded-full flex justify-center shadow-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 2 }}
+                className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
               >
                 <motion.div
-                  animate={{ y: [0, 12, 0] }}
+                  animate={{ y: [0, 8, 0] }}
                   transition={{ repeat: Infinity, duration: 2 }}
-                  className="w-1 h-2 bg-cyan-300 rounded-full mt-1 shadow-sm"
-                ></motion.div>
+                  className="w-5 h-8 border-2 border-cyan-300 rounded-full flex justify-center shadow-lg"
+                >
+                  <motion.div
+                    animate={{ y: [0, 12, 0] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="w-1 h-2 bg-cyan-300 rounded-full mt-1 shadow-sm"
+                  ></motion.div>
+                </motion.div>
               </motion.div>
             </motion.div>
-          </motion.div>
           </div>
         </div>
       </div>

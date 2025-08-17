@@ -33,7 +33,7 @@ const Contact = () => {
     {
       icon: MapPin,
       title: 'Location',
-      value: 'Greater Noida, UP',
+      value: 'Noida, UP',
       href: '#',
       color: 'from-blue-400 to-cyan-500'
     }
