@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Phone, MapPin, Github, Linkedin, Send, MessageCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Send, MessageCircle, CheckCircle, AlertCircle, Briefcase } from 'lucide-react';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -16,9 +16,9 @@ const Contact = () => {
   });
 
   // EmailJS configuration
-  const EMAILJS_SERVICE_ID = 'service_w4sqpy3';
-  const EMAILJS_TEMPLATE_ID = 'template_jq6zxsa';
-  const EMAILJS_PUBLIC_KEY = 'dRajbmKf3be_DEQxw';
+  const EMAILJS_SERVICE_ID = 'service_pm3v7po';
+  const EMAILJS_TEMPLATE_ID = 'template_1sn902v';
+  const EMAILJS_PUBLIC_KEY = 'vULCoIhUoj2b89Elo';
 
   useEffect(() => {
     // Load EmailJS script
@@ -47,25 +47,36 @@ const Contact = () => {
 
   const contactInfo = [
     {
+      icon: Briefcase,
+      title: 'Business Inquiries',
+      value: 'dev.s.utkarsh@gmail.com',
+      href: 'mailto:dev.s.utkarsh@gmail.com',
+      color: 'from-purple-400 to-pink-500',
+      description: 'For project discussions & collaborations'
+    },
+    {
       icon: Mail,
-      title: 'Email',
+      title: 'General Contact',
       value: 'singhutkarsh919@gmail.com',
       href: 'mailto:singhutkarsh919@gmail.com',
-      color: 'from-red-400 to-pink-500'
+      color: 'from-cyan-400 to-blue-500',
+      description: 'For all other inquiries'
     },
     {
       icon: Phone,
       title: 'Phone',
-      value: '+91 XXXXXXXXXX',
-      href: 'tel:+91XXXXXXXXXX',
-      color: 'from-green-400 to-teal-500'
+      value: '+91 73XXXXXX91',
+      href: 'tel:+917380710191',
+      color: 'from-green-400 to-teal-500',
+      description: 'Available Mon-Sat, 10 AM - 6 PM'
     },
     {
       icon: MapPin,
       title: 'Location',
       value: 'Noida, UP',
       href: '#',
-      color: 'from-blue-400 to-cyan-500'
+      color: 'from-orange-400 to-red-500',
+      description: 'Based in India'
     }
   ];
 
@@ -165,7 +176,21 @@ const Contact = () => {
           email: formData.email,      // matches {{email}} in template  
           subject: formData.subject,  // matches {{subject}} in template
           message: formData.message,  // matches {{message}} in template
-          reply_to: formData.email    // matches {{reply_to}} in template
+          reply_to: formData.email,   // matches {{reply_to}} in template
+          to_email: 'dev.s.utkarsh@gmail.com',  // your business email to receive messages
+          date: new Date().toLocaleDateString('en-IN', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            timeZone: 'Asia/Kolkata'
+          }),
+          time: new Date().toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: 'Asia/Kolkata'
+          })
         },
         EMAILJS_PUBLIC_KEY
       );
@@ -232,7 +257,7 @@ const Contact = () => {
       } else if (error.message && error.message.includes('EmailJS')) {
         errorMessage += error.message;
       } else {
-        errorMessage += 'Please contact me directly at singhutkarsh919@gmail.com';
+        errorMessage += 'Please contact me directly at dev.s.utkarsh@gmail.com';
       }
       
       setFormStatus({
@@ -265,7 +290,7 @@ const Contact = () => {
               <h3 className="text-xl font-bold text-white mb-4">Let's Start a Conversation</h3>
               <p className="text-gray-400 leading-relaxed mb-6 text-sm">
                 I'm always interested in hearing about new opportunities, interesting projects, 
-                or just having a chat about technology and innovation. Feel free to reach out!
+                or just having a chat about technology and innovation. Choose the best way to reach me!
               </p>
             </div>
 
@@ -275,16 +300,17 @@ const Contact = () => {
                 <div key={index} className="group">
                   <a
                     href={contact.href}
-                    className="flex items-center gap-3 p-3 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-lg hover:border-cyan-400/50 transition-all duration-300 hover:translate-x-2"
+                    className="flex items-start gap-4 p-4 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-lg hover:border-cyan-400/50 transition-all duration-300 hover:translate-x-2"
                   >
-                    <div className={`w-10 h-10 bg-gradient-to-br ${contact.color} rounded-lg flex items-center justify-center`}>
-                      <contact.icon className="text-white" size={18} />
+                    <div className={`w-12 h-12 bg-gradient-to-br ${contact.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                      <contact.icon className="text-white" size={20} />
                     </div>
-                    <div>
-                      <h4 className="text-white font-semibold group-hover:text-cyan-400 transition-colors duration-300 text-sm">
+                    <div className="flex-1">
+                      <h4 className="text-white font-semibold group-hover:text-cyan-400 transition-colors duration-300 text-sm mb-1">
                         {contact.title}
                       </h4>
-                      <p className="text-gray-400 text-sm">{contact.value}</p>
+                      <p className="text-gray-300 text-sm font-medium mb-1">{contact.value}</p>
+                      <p className="text-gray-500 text-xs">{contact.description}</p>
                     </div>
                   </a>
                 </div>
